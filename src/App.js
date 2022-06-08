@@ -1,7 +1,11 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useEffect, useCallback, useMemo} from 'react';
 import {Container} from 'react-bootstrap';
 import './App.css';
 
+const countTotal = (num) => {
+    console.log('counting...');
+    return num+10;
+}
 
 const Slider = (props) => {
 
@@ -16,17 +20,14 @@ const Slider = (props) => {
         ]
     }, []);//таким образом мы достигаем меморизированную функцию, которая вызывается только один раз в начале
 
-    function logging() {
-        console.log('log!');
-    }
     useEffect(() => {
         console.log('effect');
         document.title = `SLide ${slide}`;
-        window.addEventListener('click',logging);
+        // window.addEventListener('click',logging);
 
-        return () => {
-            window.removeEventListener('click',logging);//это аналог удаления обработчиков событии в componentWillUnmount
-        }
+        // return () => {
+        //     window.removeEventListener('click',logging);//это аналог удаления обработчиков событии в componentWillUnmount
+        // }
 
     }, [slide]); //второй аргумент принимает, зависимые параметры, это занчит что только когда будет менятся slide, запускается useEffect
 // если этот массив будет пустой , это будет = componentDidMount(), только в начале рендеринге
@@ -43,12 +44,27 @@ const Slider = (props) => {
         setAutoplay(autoplay => !autoplay);
     }
 
+    const total = useMemo(() => {
+        return countTotal(slide);
+    }, [slide]);
+
+    const style = useMemo(() => (
+        {
+            color: slide > 4 ? 'red' : 'black'
+        }
+    ),[slide])
+
+    useEffect (() => {
+        console.log("style!");
+    },[style])
+
     return (
         <Container>
             <div className="slider w-50 m-auto">
                 <Slide getSomeImages={getSomeImages}/>
                 <div className="text-center mt-5">Active slide {slide} <br/>
                 {autoplay? 'auto':null}</div>
+                <div style={style} className="text-center mt-5">Total slides {total} </div>
                 <div className="buttons mt-3">
                     <button 
                         className="btn btn-primary me-2"
